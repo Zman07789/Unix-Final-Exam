@@ -1,0 +1,53 @@
+#By Zackary Paulson
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my @word_list = ("hangman", "perl", "programming", "challenge", "array", "variable");
+
+my $selected_word = $word_list[int(rand(scalar @word_list))];
+
+my @word_characters = split //, $selected_word;
+my @display_word = ('_') x scalar @word_characters;
+my @incorrect_guesses;
+my $max_attempts = 6;
+my $attempts = 0;
+
+while ($attempts < $max_attempts) {
+    print "Word: @display_word\n";
+    print "Incorrect guesses: @incorrect_guesses\n";
+    print "Attempts left: " . ($max_attempts - $attempts) . "\n";
+
+    print "Enter a letter: ";
+    my $guess = lc(<STDIN>);
+    chomp $guess;
+
+    if (length($guess) == 1 && $guess =~ /^[a-z]$/) {
+        my $correct_guess = 0;
+
+        for my $i (0 .. $#word_characters) {
+            if ($word_characters[$i] eq $guess) {
+                $display_word[$i] = $guess;
+                $correct_guess = 1;
+            }
+        }
+
+        unless ($correct_guess) {
+            push @incorrect_guesses, $guess;
+            $attempts++;
+        }
+
+        if (join('', @display_word) eq $selected_word) {
+            print "Congratulations! You guessed the word: $selected_word\n";
+            last;
+        }
+    } else {
+        print "Invalid input. Please enter a single letter.\n";
+    }
+}
+
+if ($attempts == $max_attempts) {
+    print "Sorry, you're out of attempts. The correct word was: $selected_word\n";
+}
+
